@@ -8,25 +8,33 @@ defmodule Markov do
 
   ## Examples
       iex> text = ["a", "cat", "in", "a", "hat"]
-      iex> order = 1
-      iex> Markov.create_chain(text, order)
+      iex> Markov.create_chain(text, 1)
       %{
         "a" => ["cat", "hat"],
         "cat" => ["in"],
         "in" => ["a"],
         "hat" => [],
       }
-
+      iex> Markov.create_chain(text, 2)
+      %{
+        "a cat" => ["in"],
+        "cat in" => ["a"],
+        "in a" => ["hat"],
+        "a hat" => [],
+      }
   """
-  def create_chain(text_list, order) do
-    Enum.chunk_every(text_list, order + 1, 1)
+  def create_chain(text, order) do
+    Enum.chunk_every(text, order + 1, 1)
     |> Enum.reduce(%{}, fn(x, acc) ->
-      if Map.has_key?(acc, hd(x)) do
-        Map.merge(acc, %{hd(x) => tl(x)}, fn _k, v1, v2 ->
+      s = Enum.split(x, order)
+      g = Enum.join(elem(s, 0), " ")
+      f = elem(s, 1)
+      if Map.has_key?(acc, g) do
+        Map.merge(acc, %{g => f}, fn _k, v1, v2 ->
           v1 ++ v2
         end)
       else
-        Map.put(acc, hd(x), tl(x))
+        Map.put(acc, g, f)
       end
     end)
   end

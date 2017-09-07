@@ -15,5 +15,17 @@ defmodule MarkovTest do
 
       assert Markov.create_chain(text, order) === expected_chain
     end
+
+    test "creates a markov chain from the text provided of order 2" do
+      text = ["a", "cat", "in", "a", "hat"]
+      order = 2
+      expected_chain = %{
+        "a cat" => ["in"],
+        "cat in" => ["a"],
+        "in a" => ["hat"],
+        "a hat" => [],
+      }
+      assert Markov.create_chain(text, order) === expected_chain
+    end
   end
 end

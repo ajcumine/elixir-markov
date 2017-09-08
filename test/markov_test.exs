@@ -56,4 +56,18 @@ defmodule MarkovTest do
       assert Markov.get_gram(list, order) === "cat in"
     end
   end
+
+  describe "get_initial_gram/2" do
+    test "returns the 1st order initial gram from the text_list" do
+      list = ["a", "cat", "in", "a", "hat"]
+      order = 1
+      assert Markov.get_initial_gram(list, order) === "a"
+    end
+
+    test "returns the 2nd order initial gram from the text_list" do
+      list = ["a", "cat", "in", "a", "hat"]
+      order = 2
+      assert Markov.get_initial_gram(list, order) === "a cat"
+    end
+  end
 end

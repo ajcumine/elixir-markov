@@ -72,4 +72,22 @@ defmodule Markov do
     |> Enum.reverse()
     |> Enum.join(" ")
   end
+
+  @doc """
+  get_initial_gram/2
+  returns the next nth order initial gram from a list
+
+  ## Examples
+      iex> list = ["a", "cat", "in", "a", "hat"]
+      iex> Markov.get_initial_gram(list, 1)
+      "a"
+      iex> Markov.get_initial_gram(list, 2)
+      "a cat"
+  """
+
+  def get_initial_gram(list, order) do
+    Enum.chunk_every(list, order)
+    |> List.first()
+    |> Enum.join(" ")
+  end
 end

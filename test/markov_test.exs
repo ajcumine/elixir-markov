@@ -28,4 +28,18 @@ defmodule MarkovTest do
       assert Markov.create_chain(text, order) === expected_chain
     end
   end
+
+  describe "get_random_follower/2" do
+    test "returns a random follower from Markov chain based on the gram" do
+      chain = %{
+        "a cat" => ["in"],
+        "cat in" => ["a"],
+        "in a" => ["hat"],
+        "a hat" => [],
+      }
+      gram = "a cat"
+      expected_result = "in"
+      assert Markov.get_random_follower(chain, gram) === expected_result
+    end
+  end
 end

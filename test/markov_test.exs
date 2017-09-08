@@ -42,4 +42,18 @@ defmodule MarkovTest do
       assert Markov.get_random_follower(chain, gram) === expected_result
     end
   end
+
+  describe "get_gram/2" do
+    test "returns the next 1st order gram from a reversed list" do
+      list = ["in", "cat", "a"]
+      order = 1
+      assert Markov.get_gram(list, order) === "in"
+    end
+
+    test "returns the next 2nd order gram from a reversed list" do
+      list = ["in", "cat", "a"]
+      order = 2
+      assert Markov.get_gram(list, order) === "cat in"
+    end
+  end
 end

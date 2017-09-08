@@ -53,4 +53,23 @@ defmodule Markov do
   def get_random_follower(chain, gram) do
     Map.get(chain, gram) |> Enum.take_random(1) |> List.first()
   end
+
+  @doc """
+  get_gram/2
+  returns the next nth order gram from a reversed list
+
+  ## Examples
+      iex> list = ["in", "cat", "a"]
+      iex> Markov.get_gram(list, 1)
+      "in"
+      iex> Markov.get_gram(list, 2)
+      "cat in"
+  """
+
+  def get_gram(list, order) do
+    Enum.chunk_every(list, order)
+    |> List.first()
+    |> Enum.reverse()
+    |> Enum.join(" ")
+  end
 end

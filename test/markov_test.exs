@@ -2,9 +2,9 @@ defmodule MarkovTest do
   use ExUnit.Case
   doctest Markov
 
-  describe "create_chain/2" do
-    test "creates a markov chain from the text provided of order 1" do
-      text = ["a", "cat", "in", "a", "hat"]
+  describe "get_chain/2" do
+    test "creates a markov chain from the list provided of order 1" do
+      list = ["a", "cat", "in", "a", "hat"]
       order = 1
       expected_chain = %{
         "a" => ["cat", "hat"],
@@ -13,11 +13,11 @@ defmodule MarkovTest do
         "hat" => [],
       }
 
-      assert Markov.create_chain(text, order) === expected_chain
+      assert Markov.get_chain(list, order) === expected_chain
     end
 
-    test "creates a markov chain from the text provided of order 2" do
-      text = ["a", "cat", "in", "a", "hat"]
+    test "creates a markov chain from the list provided of order 2" do
+      list = ["a", "cat", "in", "a", "hat"]
       order = 2
       expected_chain = %{
         "a cat" => ["in"],
@@ -25,7 +25,7 @@ defmodule MarkovTest do
         "in a" => ["hat"],
         "a hat" => [],
       }
-      assert Markov.create_chain(text, order) === expected_chain
+      assert Markov.get_chain(list, order) === expected_chain
     end
   end
 
@@ -68,6 +68,20 @@ defmodule MarkovTest do
       list = ["a", "cat", "in", "a", "hat"]
       order = 2
       assert Markov.get_initial_gram(list, order) === "a cat"
+    end
+  end
+
+  describe "build_text_list/4" do
+    test "returns a tuple of the new text list and it's length" do
+      list = ["in", "cat", "a"]
+      chain = %{
+        "a cat" => ["in"],
+        "cat in" => ["a"],
+        "in a" => ["hat"],
+        "a hat" => [],
+      }
+      gram = "cat in"
+      assert Markov.build_text_list(list, chain, gram) === { ["a", "in", "cat", "a"],  10 }
     end
   end
 end

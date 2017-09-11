@@ -71,8 +71,8 @@ defmodule MarkovTest do
     end
   end
 
-  describe "build_text_list/4" do
-    test "returns a tuple of the new text list and it's length" do
+  describe "extend_list/3" do
+    test "returns the list prepending a random gram from the chain based on the gram" do
       list = ["in", "cat", "a"]
       chain = %{
         "a cat" => ["in"],
@@ -81,7 +81,7 @@ defmodule MarkovTest do
         "a hat" => [],
       }
       gram = "cat in"
-      assert Markov.build_text_list(list, chain, gram) === { ["a", "in", "cat", "a"],  10 }
+      assert Markov.extend_list(list, chain, gram) === ["a", "in", "cat", "a"]
     end
   end
 end

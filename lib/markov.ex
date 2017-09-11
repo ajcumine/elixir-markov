@@ -94,18 +94,17 @@ defmodule Markov do
   end
 
   @doc """
-  build_text_list/4
-  returns a tuple of the new text list and it's length
+  extend_list/3
+  returns the list prepending a random gram from the chain based on the gram
 
   ## Examples
       iex> list = ["in", "cat", "a"]
       iex> chain = %{ "a cat" => ["in"], "cat in" => ["a"], "in a" => ["hat"], "a hat" => [] }
       iex> gram = "cat in"
-      iex> Markov.build_text_list(list, chain, gram)
-      { ["a", "in", "cat", "a"],  10 }
+      iex> Markov.extend_list(list, chain, gram)
+      ["a", "in", "cat", "a"]
   """
-  def build_text_list(list, chain, gram) do
-    new_list = [get_random_follower(chain, gram) | list]
-    { new_list, Enum.join(new_list, " ") |> String.length() }
+  def extend_list(list, chain, gram) do
+    [get_random_follower(chain, gram) | list]
   end
 end

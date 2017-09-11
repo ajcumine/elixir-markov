@@ -49,7 +49,6 @@ defmodule Markov do
       iex> Markov.get_random_follower(chain, "a cat")
       "in"
   """
-
   def get_random_follower(chain, gram) do
     Map.get(chain, gram)
     |> Enum.take_random(1)
@@ -67,7 +66,6 @@ defmodule Markov do
       iex> Markov.get_gram(list, 2)
       "cat in"
   """
-
   def get_gram(list, order) do
     Enum.chunk_every(list, order)
     |> List.first()
@@ -86,7 +84,6 @@ defmodule Markov do
       iex> Markov.get_initial_gram(list, 2)
       "a cat"
   """
-
   def get_initial_gram(list, order) do
     Enum.chunk_every(list, order)
     |> List.first()
@@ -94,17 +91,47 @@ defmodule Markov do
   end
 
   @doc """
-  extend_list/3
-  returns the list prepending a random gram from the chain based on the gram
+  extend_list/6
+  returns the list prepending a random gram from the chain based on:
+  the gram, chain, order, and max_length
 
   ## Examples
-      iex> list = ["in", "cat", "a"]
       iex> chain = %{ "a cat" => ["in"], "cat in" => ["a"], "in a" => ["hat"], "a hat" => [] }
+      iex> order = 2
+      iex> max_length = 9
+      iex> list = ["cat", "a"]
+      iex> gram = "a cat"
+      iex> length = 5
+      iex> Markov.extend_list(chain, order, max_length, list, gram, length)
+      ["in", "cat", "a"]
+  """
+  def extend_list(_, _, max_length, list, _, length) when length > max_length do
+    tl(list)
+  end
+
+  def extend_list(chain, order, max_length, list, gram, _) do
+    next_list = [get_random_follower(chain, gram) | list]
+    next_length = Enum.join(next_list, " ") |> String.length()
+    next_gram = get_gram(next_list, order)
+    extend_list(chain, order, max_length, next_list, next_gram, next_length)
+  end
+
+  @doc """
+  generate_reverse_text_list/5
+  returns a reversed list of strings from the chain
+  using the provided order, max_length, and gram
+
+  ## Examples
+      iex> chain = %{ "a cat" => ["in"], "cat in" => ["a"], "in a" => ["hat"], "a hat" => [] }
+      iex> order = 2
+      iex> max_length = 11
+      iex> list = ["in", "cat", "a"]
       iex> gram = "cat in"
-      iex> Markov.extend_list(list, chain, gram)
+      iex> Markov.generate_reverse_text_list(chain, order, max_length, list, gram)
       ["a", "in", "cat", "a"]
   """
-  def extend_list(list, chain, gram) do
-    [get_random_follower(chain, gram) | list]
+  def generate_reverse_text_list(chain, order, max_length, list, gram) do
+    length = Enum.join(list, " ") |> String.length()
+    extend_list(chain, order, max_length, list, gram, length)
   end
 end

@@ -71,17 +71,62 @@ defmodule MarkovTest do
     end
   end
 
-  describe "extend_list/3" do
-    test "returns the list prepending a random gram from the chain based on the gram" do
-      list = ["in", "cat", "a"]
+  describe "extend_list" do
+    test "returns an extended text list if the length is less than the max_length" do
       chain = %{
         "a cat" => ["in"],
         "cat in" => ["a"],
         "in a" => ["hat"],
         "a hat" => [],
       }
-      gram = "cat in"
-      assert Markov.extend_list(list, chain, gram) === ["a", "in", "cat", "a"]
+      order = 2
+      max_length = 9
+      list = ["cat", "a"]
+      gram = "a cat"
+      length = 5
+      expected_list = ["in", "cat", "a"]
+      assert Markov.extend_list(chain, order, max_length, list, gram, length) === expected_list
+    end
+
+    test "returns an extended text list if the length is equal to the max_length" do
+      chain = %{
+        "a cat" => ["in"],
+        "cat in" => ["a"],
+        "in a" => ["hat"],
+        "a hat" => [],
+      }
+      order = 2
+      max_length = 5
+      list = ["cat", "a"]
+      gram = "a cat"
+      length = 5
+      expected_list = ["cat", "a"]
+      assert Markov.extend_list(chain, order, max_length, list, gram, length) === expected_list
+    end
+
+    test "returns the text list tail if the length is greater than the max_length" do
+      max_length = 5
+      list = ["in", "cat", "a"]
+      length = 8
+      expected_list = ["cat", "a"]
+      assert Markov.extend_list(0, 0, max_length, list, 0, length) === expected_list
+    end
+  end
+
+  describe "generate_reverse_text_list/5" do
+    test "returns a reversed list of strings from the chain using the provided order, max_length, and gram" do
+      chain = %{
+        "a" => ["cat", "hat"],
+        "cat" => ["in"],
+        "in" => ["a"],
+        "hat" => [],
+      }
+      order = 1
+      max_length = 11
+      list = ["cat", "a"]
+      gram = "cat"
+      expected_list = ["a", "in", "cat", "a"]
+      assert Markov.generate_reverse_text_list(chain, order, max_length, list, gram) === expected_list
     end
   end
 end

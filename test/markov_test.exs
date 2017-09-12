@@ -41,6 +41,15 @@ defmodule MarkovTest do
       expected_result = "in"
       assert Markov.get_random_follower(chain, gram) === expected_result
     end
+
+    test "returns nil for a case with no followers" do
+      chain = %{
+        "a hat" => [],
+      }
+      gram = "a hat"
+      expected_result = nil
+      assert Markov.get_random_follower(chain, gram) === expected_result
+    end
   end
 
   describe "get_gram/2" do
@@ -102,6 +111,18 @@ defmodule MarkovTest do
       length = 5
       expected_list = ["cat", "a"]
       assert Markov.extend_list(chain, order, max_length, list, gram, length) === expected_list
+    end
+
+    test "returns the original list if the chain has no followers" do
+      chain = %{
+        "a hat" => [],
+      }
+      order = 2
+      max_length = 10
+      list = ["hat", "a"]
+      gram = "a hat"
+      length = 5
+      assert Markov.extend_list(chain, order, max_length, list, gram, length) === list
     end
 
     test "returns the text list tail if the length is greater than the max_length" do

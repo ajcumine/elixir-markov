@@ -110,10 +110,15 @@ defmodule Markov do
   end
 
   def extend_list(chain, order, max_length, list, gram, _) do
-    next_list = [get_random_follower(chain, gram) | list]
-    next_length = Enum.join(next_list, " ") |> String.length()
-    next_gram = get_gram(next_list, order)
-    extend_list(chain, order, max_length, next_list, next_gram, next_length)
+    next_follower = get_random_follower(chain, gram)
+    if next_follower do
+      next_list = [ next_follower | list]
+      next_length = Enum.join(next_list, " ") |> String.length()
+      next_gram = get_gram(next_list, order)
+      extend_list(chain, order, max_length, next_list, next_gram, next_length)
+    else
+      list
+    end
   end
 
   @doc """

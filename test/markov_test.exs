@@ -30,7 +30,7 @@ defmodule MarkovTest do
   end
 
   describe "get_random_follower/2" do
-    test "returns a random follower from Markov chain based on the gram" do
+    test "returns a follower from Markov chain based on the gram" do
       chain = %{
         "a cat" => ["in"],
         "cat in" => ["a"],
@@ -40,6 +40,14 @@ defmodule MarkovTest do
       gram = "a cat"
       expected_result = "in"
       assert Markov.get_random_follower(chain, gram) === expected_result
+    end
+
+    test "returns a random follower from Markov chain based on the gram" do
+      chain = %{
+        "a" => ["cat", "hat"]
+      }
+      gram = "a"
+      assert Markov.get_random_follower(chain, gram) === "cat" || "hat"
     end
 
     test "returns nil for a case with no followers" do
@@ -148,6 +156,23 @@ defmodule MarkovTest do
       gram = "cat"
       expected_list = ["a", "in", "cat", "a"]
       assert Markov.generate_reverse_text_list(chain, order, max_length, list, gram) === expected_list
+    end
+  end
+
+  describe "generate_text/1-3" do
+    test "returns a string using a Markov chain generated from the source text" do
+      source_text = "cat in a hat"
+      assert Markov.generate_text(source_text) === "cat in a hat"
+    end
+
+    test "returns a string using a 2nd order Markov chain generated from the source text" do
+      source_text = "a cat in a hat"
+      assert Markov.generate_text(source_text, 2, 140) === "a cat in a hat"
+    end
+
+    test "returns a string of max_length Markov chain generated from the source text" do
+      source_text = "a cat in a hat"
+      assert Markov.generate_text(source_text, 2, 10) === "a cat in a"
     end
   end
 end

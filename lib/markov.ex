@@ -25,10 +25,11 @@ defmodule Markov do
       }
   """
   def get_chain(list, order) do
-    Enum.chunk_every(list, order + 1, 1)
+    list
+    |> Enum.chunk_every(order + 1, 1)
     |> Enum.reduce(%{}, fn(x, acc) ->
       s = Enum.split(x, order)
-      g = elem(s, 0) |> Enum.join(" ")
+      g = s |> elem(0) |> Enum.join(" ")
       f = elem(s, 1)
       if Map.has_key?(acc, g) do
         Map.merge(acc, %{g => f}, fn _k, v1, v2 ->
@@ -50,7 +51,8 @@ defmodule Markov do
       "in"
   """
   def get_random_follower(chain, gram) do
-    Map.get(chain, gram)
+    chain
+    |> Map.get(gram)
     |> Enum.take_random(1)
     |> List.first()
   end
@@ -67,7 +69,8 @@ defmodule Markov do
       "cat in"
   """
   def get_gram(list, order) do
-    Enum.chunk_every(list, order)
+    list
+    |> Enum.chunk_every(order)
     |> List.first()
     |> Enum.reverse()
     |> Enum.join(" ")
@@ -85,59 +88,62 @@ defmodule Markov do
       "a cat"
   """
   def get_initial_gram(list, order) do
-    Enum.chunk_every(list, order)
+    list
+    |> Enum.chunk_every(order)
     |> List.first()
     |> Enum.join(" ")
   end
 
   @doc """
-  extend_list/6
+  extend_list/5
   returns the list prepending a random gram from the chain based on:
   the gram, chain, order, and max_length
 
   ## Examples
       iex> chain = %{ "a cat" => ["in"], "cat in" => ["a"], "in a" => ["hat"], "a hat" => [] }
       iex> order = 2
+      iex> config = %{ chain: chain, order: order }
       iex> max_length = 9
       iex> list = ["cat", "a"]
       iex> gram = "a cat"
       iex> length = 5
-      iex> Markov.extend_list(chain, order, max_length, list, gram, length)
+      iex> Markov.extend_list(config, max_length, list, gram, length)
       ["in", "cat", "a"]
   """
-  def extend_list(_, _, max_length, list, _, length) when length > max_length do
+  def extend_list(_, max_length, list, _, length) when length > max_length do
     tl(list)
   end
 
-  def extend_list(chain, order, max_length, list, gram, _) do
-    next_follower = get_random_follower(chain, gram)
+  def extend_list(config, max_length, list, gram, _) do
+    next_follower = get_random_follower(config.chain, gram)
     if next_follower do
-      next_list = [ next_follower | list]
-      next_length = Enum.join(next_list, " ") |> String.length()
-      next_gram = get_gram(next_list, order)
-      extend_list(chain, order, max_length, next_list, next_gram, next_length)
+      next_list = [next_follower | list]
+      next_length = next_list |> Enum.join(" ") |> String.length()
+      next_gram = get_gram(next_list, config.order)
+      extend_list(config, max_length, next_list, next_gram, next_length)
     else
       list
     end
   end
 
   @doc """
-  generate_reverse_text_list/5
+  generate_reverse_text_list/4
   returns a reversed list of strings from the chain
   using the provided order, max_length, and gram
 
   ## Examples
       iex> chain = %{ "a cat" => ["in"], "cat in" => ["a"], "in a" => ["hat"], "a hat" => [] }
       iex> order = 2
+      iex> config = %{ chain: chain, order: order }
       iex> max_length = 11
       iex> list = ["in", "cat", "a"]
       iex> gram = "cat in"
-      iex> Markov.generate_reverse_text_list(chain, order, max_length, list, gram)
+      iex> Markov.generate_reverse_text_list(config, max_length, list, gram)
       ["a", "in", "cat", "a"]
   """
-  def generate_reverse_text_list(chain, order, max_length, list, gram) do
-    length = Enum.join(list, " ") |> String.length()
-    extend_list(chain, order, max_length, list, gram, length)
+  def generate_reverse_text_list(config, max_length, list, gram) do
+    length = list |> Enum.join(" ") |> String.length()
+    extend_list(config, max_length, list, gram, length)
   end
 
   @doc """
@@ -157,10 +163,14 @@ defmodule Markov do
   def generate_text(source_text, order \\ 1, max_length \\ 140, focus \\ nil) do
     text_list = String.split(source_text)
     intial_gram = if focus, do: focus, else: get_initial_gram(text_list, order)
-    initial_list = String.split(intial_gram) |> Enum.reverse
-    chain = get_chain(text_list, order)
-    reverse_list = generate_reverse_text_list(chain, order, max_length, initial_list, intial_gram)
-    Enum.reverse(reverse_list) |> Enum.join(" ")
+    initial_list = intial_gram |> String.split() |> Enum.reverse
+    %{
+      chain: get_chain(text_list, order),
+      order: order,
+    }
+    |> generate_reverse_text_list(max_length, initial_list, intial_gram)
+    |> Enum.reverse()
+    |> Enum.join(" ")
   end
 
   @doc """

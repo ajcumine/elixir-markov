@@ -1,12 +1,18 @@
 
-## Elixir Markov Chain Exercise
+# Elixir Markov Chain Exercise
 
 This is a basic text generator using a Markov chain algorithm. It is very simple and not intended to be used in any kind of environment, only as an experiment and learning tool for myself.
 
-### Requirements
-Built and tested with Elixir v1.5.1.
+## Requirements
+Built and tested with [Elixir](https://elixir-lang.org/) v1.5.1.
 
-### Usage
+Static code analysis with [Credo](https://github.com/rrrene/credo).
+
+## Usage
+To install dependencies, from the project home directory:
+```bash
+$: mix deps.get
+```
 To run the text generator, from the project home directory:
 ```bash
 $: iex -S mix
@@ -35,20 +41,24 @@ Using `Markov.generate_text/1-3` will set use an initial of the first word of th
 
 Using `Markov.generate_text_with_word/2` will use the default values for `order` and `max_length`.
 
-### Testing
+## Testing
 To run the tests, from the project home directory:
 ```bash
 $: mix test
 ```
 
-### Tips for use
+To run the static code analysis tool, ([Credo](https://github.com/rrrene/credo)):
+```bash
+$: mix credo
+```
+
+## Tips for use
 The greater your source text the more options of initial values you will have available and the more variance there will be in your generated text. 1st order chains allow for more variance in generated text but will give less readability. The higher the order used the more readable but the less variance the generated text will have.
 
-### Possible further improvements
-* Improve performance and refactor.
+## Possible further improvements
 * Read source text from a file.
 * Create a simple CLI for easy usage.
 * Build a fancy front-end UI and host this somewhere ¯\\_(ツ)_/¯
 
-### License
+## License
 MIT

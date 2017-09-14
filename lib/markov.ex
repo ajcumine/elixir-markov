@@ -54,7 +54,7 @@ defmodule Markov do
     chain
     |> Map.get(gram)
     |> Enum.take_random(1)
-    |> List.first()
+    |> List.first
   end
 
   @doc """
@@ -93,6 +93,19 @@ defmodule Markov do
   end
 
   @doc """
+  get_list_length/1
+  returns the length of the list provided with whitepsace added
+
+  ## Examples
+      iex> list = ["a", "cat"]
+      iex> Markov.get_list_length(list)
+      5
+  """
+  def get_list_length(list) do
+    list |> Enum.join(" ") |> String.length()
+  end
+
+  @doc """
   extend_list/5
   returns the list prepending a random gram from the chain based on:
   the gram, chain, order, and max_length
@@ -116,7 +129,7 @@ defmodule Markov do
     next_follower = get_random_follower(config.chain, gram)
     if next_follower do
       next_list = [next_follower | list]
-      next_length = next_list |> Enum.join(" ") |> String.length()
+      next_length = get_list_length(next_list)
       next_gram = get_gram(next_list, config.order)
       extend_list(config, max_length, next_list, next_gram, next_length)
     else
@@ -140,7 +153,7 @@ defmodule Markov do
       ["a", "in", "cat", "a"]
   """
   def generate_reverse_text_list(config, max_length, list, gram) do
-    length = list |> Enum.join(" ") |> String.length()
+    length = get_list_length(list)
     extend_list(config, max_length, list, gram, length)
   end
 

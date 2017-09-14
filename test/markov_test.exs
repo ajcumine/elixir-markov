@@ -84,6 +84,13 @@ defmodule MarkovTest do
     end
   end
 
+  describe "get_list_length/1" do
+    test "returns the length of the list provided with whitepsace added" do
+      list = ["a", "cat"]
+      assert Markov.get_list_length(list) === 5
+    end
+  end
+
   describe "extend_list/5" do
     test "returns an extended text list if the length is less than the max_length" do
       chain = %{

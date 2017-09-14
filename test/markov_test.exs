@@ -75,16 +75,12 @@ defmodule MarkovTest do
   end
 
   describe "get_initial_gram/2" do
-    test "returns the 1st order initial gram from the text_list" do
-      list = ["a", "cat", "in", "a", "hat"]
-      order = 1
-      assert Markov.get_initial_gram(list, order) === "a"
-    end
-
-    test "returns the 2nd order initial gram from the text_list" do
-      list = ["a", "cat", "in", "a", "hat"]
-      order = 2
-      assert Markov.get_initial_gram(list, order) === "a cat"
+    test "returns a random key from the chain" do
+      chain = %{
+        "a cat" => ["in"],
+        "cat in" => ["a"]
+      }
+      assert Markov.get_initial_gram(chain) === "a cat" || "cat in"
     end
   end
 
@@ -176,19 +172,19 @@ defmodule MarkovTest do
   end
 
   describe "generate_text/1-4" do
-    test "returns a string using a Markov chain generated from the source text" do
-      source_text = "cat in a hat"
-      assert Markov.generate_text(source_text) === "cat in a hat"
+    test "returns a string" do
+      source_text = "cat"
+      assert Markov.generate_text(source_text) === "cat"
     end
 
     test "returns a string using a 2nd order Markov chain generated from the source text" do
       source_text = "a cat in a hat"
-      assert Markov.generate_text(source_text, 2, 140) === "a cat in a hat"
+      assert Markov.generate_text(source_text, 2, 140, "a cat") === "a cat in a hat"
     end
 
     test "returns a string of max_length Markov chain generated from the source text" do
       source_text = "a cat in a hat"
-      assert Markov.generate_text(source_text, 2, 10) === "a cat in a"
+      assert Markov.generate_text(source_text, 2, 10, "a cat") === "a cat in a"
     end
   end
 

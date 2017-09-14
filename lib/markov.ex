@@ -77,21 +77,19 @@ defmodule Markov do
   end
 
   @doc """
-  get_initial_gram/2
-  returns the next nth order initial gram from a list
+  get_initial_gram/1
+  returns a random key from the chain
 
   ## Examples
-      iex> list = ["a", "cat", "in", "a", "hat"]
-      iex> Markov.get_initial_gram(list, 1)
-      "a"
-      iex> Markov.get_initial_gram(list, 2)
+      iex> chain = %{ "a cat" => ["in"] }
+      iex> Markov.get_initial_gram(chain)
       "a cat"
   """
-  def get_initial_gram(list, order) do
-    list
-    |> Enum.chunk_every(order)
-    |> List.first()
-    |> Enum.join(" ")
+  def get_initial_gram(chain) do
+    chain
+    |> Enum.take_random(1)
+    |> hd()
+    |> elem(0)
   end
 
   @doc """
@@ -157,15 +155,16 @@ defmodule Markov do
 
   ## Examples
       iex> body = "cat in a hat"
-      iex> Markov.generate_text(body, 1, 8)
+      iex> Markov.generate_text(body, 1, 8, "cat")
       "cat in a"
   """
   def generate_text(source_text, order \\ 1, max_length \\ 140, focus \\ nil) do
     text_list = String.split(source_text)
-    intial_gram = if focus, do: focus, else: get_initial_gram(text_list, order)
+    chain = get_chain(text_list, order)
+    intial_gram = if focus, do: focus, else: get_initial_gram(chain)
     initial_list = intial_gram |> String.split() |> Enum.reverse
     %{
-      chain: get_chain(text_list, order),
+      chain: chain,
       order: order,
     }
     |> generate_reverse_text_list(max_length, initial_list, intial_gram)

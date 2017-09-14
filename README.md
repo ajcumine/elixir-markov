@@ -19,10 +19,10 @@ $: iex -S mix
 ```
 This will load the interactive elixir environment with the project included. Within this environment there are 2 options:
 ```elixir
-iex> Markov.generate_text(body, order, max_length)
+iex> Markov.generate_text(source_text, order, max_length, focus)
 ```
 ```elixir
-iex> Markov.generate_text_with_word(body, initial)
+iex> Markov.generate_text_with_word(source_text, focus)
 ```
 
 Body:
@@ -34,12 +34,12 @@ This is the number of words used to generate the values for each key of the Mark
 Max Length:
 This is the maximum number of characters that the generated text will reach. This defaults to 140 characters.
 
-Initial:
-This is the word that will be used as the starting point for any string generated, if it is chosen poorly the generated string will be small.
+Focus:
+This is the word that will be used as the starting point for any string generated, if it is chosen poorly the generated string will be small. This must have the same number of words as the `order`. If this is not provided a random focus will be picked based on the `order` and `source_text`
 
-Using `Markov.generate_text/1-3` will set use an initial of the first word of the body string.
+Using `Markov.generate_text/1-4` allows you to provide the `order`, `max_length`, and `focus` or use their default values.
 
-Using `Markov.generate_text_with_word/2` will use the default values for `order` and `max_length`.
+Using `Markov.generate_text_with_word/2` will use the default values for `order` and `max_length`, and provide a random `focus` based on the `source_text` provided.
 
 ## Testing
 To run the tests, from the project home directory:

@@ -4,12 +4,12 @@ defmodule MarkovTest do
 
   describe "get_chain/2" do
     test "creates a markov chain from the list provided of order 1" do
-      list = ["a", "cat", "in", "a", "hat"]
+      list = ["the", "cat", "in", "the", "hat"]
       order = 1
       expected_chain = %{
-        "a" => ["cat", "hat"],
+        "the" => ["cat", "hat"],
         "cat" => ["in"],
-        "in" => ["a"],
+        "in" => ["the"],
         "hat" => [],
       }
 
@@ -17,13 +17,13 @@ defmodule MarkovTest do
     end
 
     test "creates a markov chain from the list provided of order 2" do
-      list = ["a", "cat", "in", "a", "hat"]
+      list = ["the", "cat", "in", "the", "hat"]
       order = 2
       expected_chain = %{
-        "a cat" => ["in"],
-        "cat in" => ["a"],
-        "in a" => ["hat"],
-        "a hat" => [],
+        "the cat" => ["in"],
+        "cat in" => ["the"],
+        "in the" => ["hat"],
+        "the hat" => [],
       }
       assert Markov.get_chain(list, order) === expected_chain
     end
@@ -32,29 +32,29 @@ defmodule MarkovTest do
   describe "get_random_follower/2" do
     test "returns a follower from Markov chain based on the gram" do
       chain = %{
-        "a cat" => ["in"],
-        "cat in" => ["a"],
-        "in a" => ["hat"],
-        "a hat" => [],
+        "the cat" => ["in"],
+        "cat in" => ["the"],
+        "in the" => ["hat"],
+        "the hat" => [],
       }
-      gram = "a cat"
+      gram = "the cat"
       expected_result = "in"
       assert Markov.get_random_follower(chain, gram) === expected_result
     end
 
     test "returns a random follower from Markov chain based on the gram" do
       chain = %{
-        "a" => ["cat", "hat"]
+        "the" => ["cat", "hat"]
       }
-      gram = "a"
+      gram = "the"
       assert Markov.get_random_follower(chain, gram) === "cat" || "hat"
     end
 
     test "returns nil for a case with no followers" do
       chain = %{
-        "a hat" => [],
+        "the hat" => [],
       }
-      gram = "a hat"
+      gram = "the hat"
       expected_result = nil
       assert Markov.get_random_follower(chain, gram) === expected_result
     end
@@ -62,13 +62,13 @@ defmodule MarkovTest do
 
   describe "get_gram/2" do
     test "returns the next 1st order gram from a reversed list" do
-      list = ["in", "cat", "a"]
+      list = ["in", "cat", "the"]
       order = 1
       assert Markov.get_gram(list, order) === "in"
     end
 
     test "returns the next 2nd order gram from a reversed list" do
-      list = ["in", "cat", "a"]
+      list = ["in", "cat", "the"]
       order = 2
       assert Markov.get_gram(list, order) === "cat in"
     end
@@ -77,47 +77,47 @@ defmodule MarkovTest do
   describe "get_initial_gram/2" do
     test "returns a random key from the chain" do
       chain = %{
-        "a cat" => ["in"],
-        "cat in" => ["a"]
+        "the cat" => ["in"],
+        "cat in" => ["the"]
       }
-      assert Markov.get_initial_gram(chain) === "a cat" || "cat in"
+      assert Markov.get_initial_gram(chain) === "the cat" || "cat in"
     end
   end
 
   describe "get_list_length/1" do
     test "returns the length of the list provided with whitepsace added" do
-      list = ["a", "cat"]
-      assert Markov.get_list_length(list) === 5
+      list = ["the", "cat"]
+      assert Markov.get_list_length(list) === 7
     end
   end
 
   describe "extend_list/5" do
     test "returns an extended text list if the length is less than the max_length" do
       chain = %{
-        "a cat" => ["in"],
-        "cat in" => ["a"],
-        "in a" => ["hat"],
-        "a hat" => [],
+        "the cat" => ["in"],
+        "cat in" => ["the"],
+        "in the" => ["hat"],
+        "the hat" => [],
       }
       order = 2
       config = %{
         chain: chain,
         order: order,
       }
-      max_length = 9
-      list = ["cat", "a"]
-      gram = "a cat"
+      max_length = 11
+      list = ["cat", "the"]
+      gram = "the cat"
       length = 5
-      expected_list = ["in", "cat", "a"]
+      expected_list = ["in", "cat", "the"]
       assert Markov.extend_list(config, max_length, list, gram, length) === expected_list
     end
 
     test "returns an extended text list if the length is equal to the max_length" do
       chain = %{
-        "a cat" => ["in"],
-        "cat in" => ["a"],
-        "in a" => ["hat"],
-        "a hat" => [],
+        "the cat" => ["in"],
+        "cat in" => ["the"],
+        "in the" => ["hat"],
+        "the hat" => [],
       }
       order = 2
       config = %{
@@ -125,16 +125,16 @@ defmodule MarkovTest do
         order: order,
       }
       max_length = 5
-      list = ["cat", "a"]
-      gram = "a cat"
+      list = ["cat", "the"]
+      gram = "the cat"
       length = 5
-      expected_list = ["cat", "a"]
+      expected_list = ["cat", "the"]
       assert Markov.extend_list(config, max_length, list, gram, length) === expected_list
     end
 
     test "returns the original list if the chain has no followers" do
       chain = %{
-        "a hat" => [],
+        "the hat" => [],
       }
       order = 2
       config = %{
@@ -142,17 +142,17 @@ defmodule MarkovTest do
         order: order,
       }
       max_length = 10
-      list = ["hat", "a"]
-      gram = "a hat"
+      list = ["hat", "the"]
+      gram = "the hat"
       length = 5
       assert Markov.extend_list(config, max_length, list, gram, length) === list
     end
 
     test "returns the text list tail if the length is greater than the max_length" do
       max_length = 5
-      list = ["in", "cat", "a"]
+      list = ["in", "cat", "the"]
       length = 8
-      expected_list = ["cat", "a"]
+      expected_list = ["cat", "the"]
       assert Markov.extend_list(%{}, max_length, list, 0, length) === expected_list
     end
   end
@@ -160,9 +160,9 @@ defmodule MarkovTest do
   describe "generate_reverse_text_list/4" do
     test "returns a reversed list of strings from the chain using the provided order, max_length, and gram" do
       chain = %{
-        "a" => ["cat", "hat"],
+        "the" => ["cat", "hat"],
         "cat" => ["in"],
-        "in" => ["a"],
+        "in" => ["the"],
         "hat" => [],
       }
       order = 1
@@ -170,10 +170,10 @@ defmodule MarkovTest do
         chain: chain,
         order: order,
       }
-      max_length = 11
-      list = ["cat", "a"]
+      max_length = 15
+      list = ["cat", "the"]
       gram = "cat"
-      expected_list = ["a", "in", "cat", "a"]
+      expected_list = ["the", "in", "cat", "the"]
       assert Markov.generate_reverse_text_list(config, max_length, list, gram) === expected_list
     end
   end
@@ -185,13 +185,13 @@ defmodule MarkovTest do
     end
 
     test "returns a string using a 2nd order Markov chain generated from the source text" do
-      source_text = "a cat in a hat"
-      assert Markov.generate_text(source_text, 2, 140, "a cat") === "a cat in a hat"
+      source_text = "the cat in the hat"
+      assert Markov.generate_text(source_text, 2, 140, "the cat") === "the cat in the hat"
     end
 
     test "returns a string of max_length Markov chain generated from the source text" do
-      source_text = "a cat in a hat"
-      assert Markov.generate_text(source_text, 2, 10, "a cat") === "a cat in a"
+      source_text = "the cat in the hat"
+      assert Markov.generate_text(source_text, 2, 14, "the cat") === "the cat in the"
     end
   end
 

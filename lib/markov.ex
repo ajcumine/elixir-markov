@@ -8,20 +8,20 @@ defmodule Markov do
   returns the Markov chain for a provided list and order
 
   ## Examples
-      iex> list = ["a", "cat", "in", "a", "hat"]
+      iex> list = ["the", "cat", "in", "the", "hat"]
       iex> Markov.get_chain(list, 1)
       %{
-        "a" => ["cat", "hat"],
+        "the" => ["cat", "hat"],
         "cat" => ["in"],
-        "in" => ["a"],
+        "in" => ["the"],
         "hat" => [],
       }
       iex> Markov.get_chain(list, 2)
       %{
-        "a cat" => ["in"],
-        "cat in" => ["a"],
-        "in a" => ["hat"],
-        "a hat" => [],
+        "the cat" => ["in"],
+        "cat in" => ["the"],
+        "in the" => ["hat"],
+        "the hat" => [],
       }
   """
   def get_chain(list, order) do
@@ -46,8 +46,8 @@ defmodule Markov do
   returns a random follower from Markov chain based on the gram
 
   ## Examples
-      iex> chain = %{"a cat" => ["in"], "cat in" => ["a"], "in a" => ["hat"], "a hat" => []}
-      iex> Markov.get_random_follower(chain, "a cat")
+      iex> chain = %{"the cat" => ["in"], "cat in" => ["the"], "in the" => ["hat"], "the hat" => []}
+      iex> Markov.get_random_follower(chain, "the cat")
       "in"
   """
   def get_random_follower(chain, gram) do
@@ -62,7 +62,7 @@ defmodule Markov do
   returns the next nth order gram from a reversed list
 
   ## Examples
-      iex> list = ["in", "cat", "a"]
+      iex> list = ["in", "cat", "the"]
       iex> Markov.get_gram(list, 1)
       "in"
       iex> Markov.get_gram(list, 2)
@@ -81,9 +81,9 @@ defmodule Markov do
   returns a random key from the chain
 
   ## Examples
-      iex> chain = %{ "a cat" => ["in"] }
+      iex> chain = %{ "the cat" => ["in"] }
       iex> Markov.get_initial_gram(chain)
-      "a cat"
+      "the cat"
   """
   def get_initial_gram(chain) do
     chain
@@ -97,9 +97,9 @@ defmodule Markov do
   returns the length of the list provided with whitepsace added
 
   ## Examples
-      iex> list = ["a", "cat"]
+      iex> list = ["the", "cat"]
       iex> Markov.get_list_length(list)
-      5
+      7
   """
   def get_list_length(list) do
     list |> Enum.join(" ") |> String.length()
@@ -111,15 +111,15 @@ defmodule Markov do
   the gram, chain, order, and max_length
 
   ## Examples
-      iex> chain = %{ "a cat" => ["in"], "cat in" => ["a"], "in a" => ["hat"], "a hat" => [] }
+      iex> chain = %{ "the cat" => ["in"], "cat in" => ["the"], "in the" => ["hat"], "the hat" => [] }
       iex> order = 2
       iex> config = %{ chain: chain, order: order }
-      iex> max_length = 9
-      iex> list = ["cat", "a"]
-      iex> gram = "a cat"
+      iex> max_length = 11
+      iex> list = ["cat", "the"]
+      iex> gram = "the cat"
       iex> length = 5
       iex> Markov.extend_list(config, max_length, list, gram, length)
-      ["in", "cat", "a"]
+      ["in", "cat", "the"]
   """
   def extend_list(_, max_length, list, _, length) when length > max_length do
     tl(list)
@@ -143,14 +143,14 @@ defmodule Markov do
   using the provided order, max_length, and gram
 
   ## Examples
-      iex> chain = %{ "a cat" => ["in"], "cat in" => ["a"], "in a" => ["hat"], "a hat" => [] }
+      iex> chain = %{ "the cat" => ["in"], "cat in" => ["the"], "in the" => ["hat"], "the hat" => [] }
       iex> order = 2
       iex> config = %{ chain: chain, order: order }
-      iex> max_length = 11
-      iex> list = ["in", "cat", "a"]
+      iex> max_length = 15
+      iex> list = ["in", "cat", "the"]
       iex> gram = "cat in"
       iex> Markov.generate_reverse_text_list(config, max_length, list, gram)
-      ["a", "in", "cat", "a"]
+      ["the", "in", "cat", "the"]
   """
   def generate_reverse_text_list(config, max_length, list, gram) do
     length = get_list_length(list)
@@ -167,9 +167,9 @@ defmodule Markov do
   max_length = 140
 
   ## Examples
-      iex> body = "cat in a hat"
-      iex> Markov.generate_text(body, 1, 8, "cat")
-      "cat in a"
+      iex> body = "cat in the hat"
+      iex> Markov.generate_text(body, 1, 10, "cat")
+      "cat in the"
   """
   def generate_text(source_text, order \\ 1, max_length \\ 140, focus \\ nil) do
     text_list = String.split(source_text)
